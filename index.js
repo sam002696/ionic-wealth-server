@@ -4,7 +4,7 @@ const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
 const app = express()
-const port = 5000
+const port = process.env.PORT || 5000;
 
 // middleware
 app.use(cors());
@@ -13,6 +13,7 @@ app.use(express.json());
 //ionicwealth
 //1WuiL3MeYz8Nfi9a
 const uri = "mongodb+srv://ionicwealth:1WuiL3MeYz8Nfi9a@cluster0.7bztq.mongodb.net/ionicWealth_db?retryWrites=true&w=majority";
+
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
