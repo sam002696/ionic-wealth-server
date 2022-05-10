@@ -24,7 +24,7 @@ async function run() {
         const database = client.db('ionicWealth_db');
         const reviewsCollection = database.collection('reviews');
         const usersCollection = database.collection('users');
-
+        const documentsCollection = database.collection('documents');
         // add a review
         app.post('/reviews', async (req, res) => {
             const review = req.body;
@@ -59,6 +59,13 @@ async function run() {
             const updateDoc = { $set: user, $currentDate: { updatedAt: true }, $setOnInsert: { createdAt: new Date() } };
 
             const result = await usersCollection.updateOne(filter, updateDoc, options);
+            res.json(result);
+        });
+        // post all uploaded documents
+
+        app.post('/documents', async (req, res) => {
+            const document = req.body;
+            const result = await documentsCollection.insertOne(document);
             res.json(result);
         });
     } catch {
