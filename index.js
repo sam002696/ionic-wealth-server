@@ -68,6 +68,11 @@ async function run() {
             const result = await documentsCollection.insertOne(document);
             res.json(result);
         });
+        // get all documents
+        app.get('/documents', async (req, res) => {
+            const cursor = await documentsCollection.find({}).toArray();
+            res.json(cursor);
+        });
 
         // update user to admin role
 		app.put('/users/admin', async (req, res) => {
