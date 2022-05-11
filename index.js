@@ -37,7 +37,11 @@ async function run() {
             const cursor = await reviewsCollection.find({}).toArray();
             res.json(cursor);
         });
-
+        // get all users
+        app.get('/users', async (req, res) => {
+            const cursor = await usersCollection.find({}).toArray();
+            res.json(cursor);
+        });
         // add an user
         app.post('/users', async (req, res) => {
             const user = req.body;
