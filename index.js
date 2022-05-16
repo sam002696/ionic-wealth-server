@@ -84,6 +84,16 @@ async function run() {
             const user = await documentsCollection.findOne(query);
             res.json(user);
         });
+        //post single document
+        app.post('/documents/:email', async (req, res) => {
+            const email = req.params.email;
+            const document = req.body;
+            const query = { email: email };
+            const updateDoc = { $set: document, $currentDate: { updatedAt: true }, $setOnInsert: { createdAt: new Date() } };
+            const options = { upsert: true };
+            const result = await documentsCollection.updateOne(query, updateDoc, options);
+            res.json(result);
+        });
         // update single document
         app.put('/documents/:email', async (req, res) => {
             const email = req.params.email;
