@@ -77,7 +77,13 @@ async function run() {
             const cursor = await documentsCollection.find({}).toArray();
             res.json(cursor);
         });
-
+        // get single document
+        app.get('/documents/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const user = await documentsCollection.findOne(query);
+            res.json(user);
+        });
         // delete a document
         app.delete('/documents/:id', async (req, res) => {
             const id = req.params.id;
