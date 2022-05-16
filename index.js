@@ -84,6 +84,15 @@ async function run() {
             const user = await documentsCollection.findOne(query);
             res.json(user);
         });
+        // update single document
+        app.put('/documents/:email', async (req, res) => {
+            const email = req.params.email;
+            const query = { email: email };
+            const updateDoc = { $set: req.body, $currentDate: { updatedAt: true } };
+            const options = { upsert: true };
+            const result = await documentsCollection.updateOne(query, updateDoc, options);
+            res.json(result);
+        });
         // delete a document
         app.delete('/documents/:id', async (req, res) => {
             const id = req.params.id;
