@@ -42,6 +42,12 @@ async function run() {
             const cursor = await usersCollection.find({}).toArray();
             res.json(cursor);
         });
+        //get single user
+        app.get('/users/:email', async (req, res) => {
+            const email = req.params.email;
+            const cursor = await usersCollection.findOne({ email: email });
+            res.json(cursor);
+        });
         // add an user
         app.post('/users', async (req, res) => {
             const user = req.body;
