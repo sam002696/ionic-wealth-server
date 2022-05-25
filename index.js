@@ -128,8 +128,8 @@ async function run() {
             let isAdmin = false;
             if (user?.role === 'admin') {
                 isAdmin = true;
-                res.json({ admin: isAdmin });
             }
+            res.json({ admin: isAdmin });
 
         });
 
