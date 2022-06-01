@@ -31,15 +31,17 @@ function verifyToken(req, res, next) {
     if (!authHeader) {
         return res.status(401).send({ message: 'UnAuthorized access' });
     }
-    const token = authHeader.split(' ')[1];
-    admin.auth().verifyIdToken(token)
-        .then(decodedToken => {
-            req.user = decodedToken;
-            next();
-        })
-        .catch(error => {
-            res.status(403).send({ message: 'Invalid token' });
-        });
+    else {
+        const token = authHeader.split(' ')[1];
+        admin.auth().verifyIdToken(token)
+            .then(decodedToken => {
+                req.user = decodedToken;
+                next();
+            })
+            .catch(error => {
+                res.status(403).send({ message: 'Invalid token' });
+            });
+    }
 }
 
 async function run() {
@@ -112,7 +114,6 @@ async function run() {
 
         // all documents 
         app.get('/documents', verifyToken, async (req, res) => {
-
             const cursor = await documentsCollection.find({}).toArray();
             res.json(cursor);
 
