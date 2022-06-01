@@ -112,7 +112,7 @@ async function run() {
 
         //verify all documents using verifyToken
         app.get('/documents', verifyToken, async (req, res) => {
-            const user = req.decoded.email;
+            const user = req.decodedToken.email;
             const document = req.body;
             if (user == document) {
                 const cursor = await documentsCollection.find({}).toArray();
