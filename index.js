@@ -3,6 +3,7 @@ const cors = require('cors');
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
 require('dotenv').config();
+const admin = require("firebase-admin");
 const app = express()
 const port = process.env.PORT || 5000;
 
@@ -17,6 +18,29 @@ const uri = "mongodb+srv://ionicwealth:1WuiL3MeYz8Nfi9a@cluster0.7bztq.mongodb.n
 
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+var serviceAccount = require("./ionic-wealth-fa-firebase-adminsdk.json");
+
+admin.initializeApp({
+    credential: admin.credential.cert(serviceAccount)
+});
+
+
+// verfiy token
+function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'UnAuthorized access' });
+    }
+    const token = authHeader.split(' ')[1];
+    admin.auth().verifyIdToken(token)
+        .then(decodedToken => {
+            req.user = decodedToken;
+            next();
+        })
+        .catch(error => {
+            res.status(403).send({ message: 'Invalid token' });
+        });
+}
 
 async function run() {
     try {
@@ -31,6 +55,18 @@ async function run() {
             const result = await reviewsCollection.insertOne(review);
             res.json(result);
         });
+
+        // verify admin
+        const verifyAdmin = async (req, res, next) => {
+            const requester = req.decoded.email;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                next();
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' });
+            }
+        }
 
         // get all reviews
         app.get('/reviews', async (req, res) => {
@@ -72,11 +108,18 @@ async function run() {
             const result = await documentsCollection.insertOne(document);
             res.json(result);
         });
-        // get all documents
-        app.get('/documents', async (req, res) => {
-            const cursor = await documentsCollection.find({}).toArray();
-            res.json(cursor);
+
+
+        //verify all documents using verifyToken
+        app.get('/documents', verifyToken, async (req, res) => {
+            const user = req.decoded.email;
+            const document = req.body;
+            if (user == document) {
+                const cursor = await documentsCollection.find({}).toArray();
+                res.json(cursor);
+            }
         });
+
         // get single document
         app.get('/documents/:email', async (req, res) => {
             const email = req.params.email;
