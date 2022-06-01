@@ -110,14 +110,12 @@ async function run() {
         });
 
 
-        //verify all documents using verifyToken
+        // all documents 
         app.get('/documents', verifyToken, async (req, res) => {
-            const user = req.decodedToken.email;
-            const document = req.body;
-            if (user == document) {
-                const cursor = await documentsCollection.find({}).toArray();
-                res.json(cursor);
-            }
+
+            const cursor = await documentsCollection.find({}).toArray();
+            res.json(cursor);
+
         });
 
         // get single document
