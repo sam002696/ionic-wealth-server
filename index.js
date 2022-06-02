@@ -31,6 +31,7 @@ async function verifyToken(req, res, next) {
     try {
         const token = authHeader.split('Bearer ')[1];
         const decodedToken = await admin.auth().verifyIdToken(token);
+        req.decodedUserEmail = decodedToken.email;
         req.user = decodedToken;
         next();
     }
@@ -119,9 +120,14 @@ async function run() {
         // get single document
         app.get('/documents/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
-            const query = { email: email };
-            const user = await documentsCollection.findOne(query);
-            res.json(user);
+            if (req.decodedUserEmail === email) {
+                const query = { email: email };
+                const user = await documentsCollection.findOne(query);
+                res.json(user);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' });
+            }
         });
         //post single document
         app.post('/documents/:email', async (req, res) => {
