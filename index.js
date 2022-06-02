@@ -148,7 +148,7 @@ async function run() {
         });
 
         // update user to admin role
-        app.put('/users/admin', async (req, res) => {
+        app.put('/users/admin', verifyToken, async (req, res) => {
             const requester = req.decodedUserEmail;
             const requesterAccount = await userCollection.findOne({ email: requester });
             if (requesterAccount.role === 'admin') {
