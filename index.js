@@ -26,21 +26,16 @@ admin.initializeApp({
 
 
 // verfiy token
-function verifyToken(req, res, next) {
+async function verifyToken(req, res, next) {
     const authHeader = req.headers.authorization;
-    if (!authHeader) {
-        return res.status(401).send({ message: 'UnAuthorized access' });
-    }
-    else {
+    try {
         const token = authHeader.split(' ')[1];
-        admin.auth().verifyIdToken(token)
-            .then(decodedToken => {
-                req.user = decodedToken;
-                next();
-            })
-            .catch(error => {
-                res.status(403).send({ message: 'Invalid token' });
-            });
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken;
+        next();
+    }
+    catch (e) {
+        res.status(401).send('Unauthorized');
     }
 }
 
