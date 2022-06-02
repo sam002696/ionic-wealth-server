@@ -27,17 +27,17 @@ admin.initializeApp({
 
 // verfiy token
 async function verifyToken(req, res, next) {
-    if (req.headers?.authorization) {
-        try {
-            const token = req.headers.authorization.split('Bearer ')[1];
-            const decodedToken = await admin.auth().verifyIdToken(token);
-            req.user = decodedToken;
-            next();
-        }
-        catch (e) {
-            res.status(403).json({ message: 'Unauthorized' });
-        }
+    const authHeader = req.headers?.authorization;
+    try {
+        const token = authHeader.split('Bearer ')[1];
+        const decodedToken = await admin.auth().verifyIdToken(token);
+        req.user = decodedToken;
+        next();
     }
+    catch (e) {
+        res.status(403).json({ message: 'Unauthorized' });
+    }
+
 
 }
 
