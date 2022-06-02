@@ -36,7 +36,7 @@ async function verifyToken(req, res, next) {
         next();
     }
     catch (error) {
-
+        res.status(401).send('Unauthorized');
     }
 
 
