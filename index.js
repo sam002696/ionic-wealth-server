@@ -87,9 +87,9 @@ async function run() {
             const options = { upsert: true };
             const updateDoc = { $set: user, $currentDate: { updatedAt: true }, $setOnInsert: { createdAt: new Date() } };
             //expires token
-            const token = await admin.auth().createCustomToken(user.email).expiresIn("1h");
+            // const token = await admin.auth().createCustomToken(user.email).expiresIn("1h");
 
-            const result = await usersCollection.updateOne(filter, updateDoc, options, token);
+            const result = await usersCollection.updateOne(filter, updateDoc, options);
             res.json(result);
         });
         // post all uploaded documents
