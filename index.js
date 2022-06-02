@@ -118,7 +118,7 @@ async function run() {
         });
 
         // get single document
-        app.get('/documents/:email', async (req, res) => {
+        app.get('/documents/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
             const user = await documentsCollection.findOne(query);
