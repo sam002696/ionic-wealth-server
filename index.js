@@ -27,7 +27,7 @@ admin.initializeApp({
 
 // verfiy token
 async function verifyToken(req, res, next) {
-    if (req.headers?.authorization?.startsWith('Bearer ')) {
+    if (req.headers?.authorization) {
         try {
             const token = req.headers.authorization.split('Bearer ')[1];
             const decodedToken = await admin.auth().verifyIdToken(token);
