@@ -35,8 +35,8 @@ async function verifyToken(req, res, next) {
         req.user = decodedToken;
         next();
     }
-    catch (e) {
-        res.status(403).json({ message: 'Unauthorized' });
+    catch (error) {
+
     }
 
 
