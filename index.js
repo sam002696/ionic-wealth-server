@@ -35,7 +35,7 @@ async function verifyToken(req, res, next) {
         next();
     }
     catch (e) {
-        res.status(401).send('Unauthorized');
+        res.status(403).json({ message: 'Unauthorized' });
     }
 }
 
