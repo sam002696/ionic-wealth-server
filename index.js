@@ -56,17 +56,6 @@ async function run() {
             res.json(result);
         });
 
-        // verify admin
-        const verifyAdmin = async (req, res, next) => {
-            const requester = req.decoded.email;
-            const requesterAccount = await userCollection.findOne({ email: requester });
-            if (requesterAccount.role === 'admin') {
-                next();
-            }
-            else {
-                res.status(403).send({ message: 'forbidden' });
-            }
-        }
 
         // get all reviews
         app.get('/reviews', async (req, res) => {
@@ -74,7 +63,7 @@ async function run() {
             res.json(cursor);
         });
         // get all users
-        app.get('/users', async (req, res) => {
+        app.get('/users', verifyToken, async (req, res) => {
             const cursor = await usersCollection.find({}).toArray();
             res.json(cursor);
         });
@@ -97,8 +86,10 @@ async function run() {
             const filter = { email: user.email };
             const options = { upsert: true };
             const updateDoc = { $set: user, $currentDate: { updatedAt: true }, $setOnInsert: { createdAt: new Date() } };
+            //expires token
+            const token = await admin.auth().createCustomToken(user.email).expiresIn("1h");
 
-            const result = await usersCollection.updateOne(filter, updateDoc, options);
+            const result = await usersCollection.updateOne(filter, updateDoc, options, token);
             res.json(result);
         });
         // post all uploaded documents
@@ -158,15 +149,23 @@ async function run() {
 
         // update user to admin role
         app.put('/users/admin', async (req, res) => {
-            const user = req.body;
-            const filter = { email: user.email };
-            const updateDoc = { $set: { role: 'admin' } };
-            const result = await usersCollection.updateOne(filter, updateDoc);
-            res.json(result);
+            const requester = req.decodedUserEmail;
+            const requesterAccount = await userCollection.findOne({ email: requester });
+            if (requesterAccount.role === 'admin') {
+                const user = req.body;
+                const filter = { email: user.email };
+                const updateDoc = { $set: { role: 'admin' } };
+                const result = await usersCollection.updateOne(filter, updateDoc);
+                res.json(result);
+            }
+            else {
+                res.status(403).send({ message: 'forbidden' });
+            }
+
         })
 
         // check an user if admin
-        app.get('/users/:email', async (req, res) => {
+        app.get('/users/:email', verifyToken, async (req, res) => {
             const email = req.params.email;
             const query = { email: email };
             const user = await usersCollection.findOne(query);
