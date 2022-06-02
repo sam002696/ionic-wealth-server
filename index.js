@@ -63,7 +63,7 @@ async function run() {
             res.json(cursor);
         });
         // get all users
-        app.get('/users', verifyToken, async (req, res) => {
+        app.get('/users', async (req, res) => {
             const cursor = await usersCollection.find({}).toArray();
             res.json(cursor);
         });
